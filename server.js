@@ -1,8 +1,18 @@
 const express = require('express')
 var request = require('request');
-var script = require("./script.js");
+// var script = require("./script.js");
 
-const app = express(); 
+const admin = require("firebase-admin");
+
+const serviceAccount = require("./test-file-store-d0505-firebase-adminsdk-ughbe-38a613249a.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://test-file-store-d0505.firebaseio.com"
+});
+const firebase = admin.database()
+// console.log("Check: ",firebase)
+const app = express();
 const port = 9000;
 
 const path = require('path')
@@ -22,14 +32,22 @@ app.get("/api", (req, res) => {
   let keypath = ""
   const itemsRef = firebase.database().ref(`user/$gfegefg/event/bgregerg/participant`)
   const item = {
-      email: this.state.email,
-      is_select_image: false,
-      panticipant_picture_confirm: false
+    email: this.state.email,
+    is_select_image: false,
+    panticipant_picture_confirm: false
   }
   //itemsRef.push(item)
-request(res.send(itemsRef.push(item))
-)
-}); 
+  request(res.send(itemsRef.push(item))
+  )
+});
+
+app.get('/test_api', (req, res) => {
+  const itemRef = firebase.ref(`user`)
+  itemRef.on('value', function(snap) {
+    console.log("Snap: " + snap.val())
+    res.json(snap.val())
+  })
+})
 
 
 app.post('/fetch_external_image', async (req, res) => {
@@ -49,7 +67,7 @@ app.post('/fetch_external_image', async (req, res) => {
 app.listen(port, () => console.log(`Listening on port ${port}!`))
 
 function request(url, returnBuffer = true, timeout = 10000) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const options = Object.assign(
       {},
       {
@@ -63,7 +81,7 @@ function request(url, returnBuffer = true, timeout = 10000) {
       returnBuffer ? { encoding: null } : {}
     )
 
-    get(options, function(err, res) {
+    get(options, function (err, res) {
       if (err) return reject(err)
       return resolve(res)
     })
