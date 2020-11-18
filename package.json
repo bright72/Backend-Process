@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "justadudewhohacks",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "face-api.js": "^0.22.2",
+    "file-system": "^2.2.2",
+    "firebase": "^8.0.2",
+    "firebase-admin": "^9.4.1",
+    "firebase-functions": "^3.11.0",
+    "request": "^2.88.2",
+    "type": "module"
+  }
+}
