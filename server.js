@@ -10,6 +10,7 @@ const port = 9000;
 const path = require('path')
 const admin = require("firebase-admin");
 const serviceAccount = require("./test-file-store-d0505-firebase-adminsdk-ughbe-38a613249a.json");
+const { count } = require('console');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://test-file-store-d0505.firebaseio.com"
@@ -25,56 +26,114 @@ app.use(express.static(viewsDir))
 app.get('/', (req, res) => res.sendFile(path.join(viewsDir, 'index.html')))
 
 app.post('/test_api', (req, res) => {
-  
-  // faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
-  // faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-  // faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
 
   const obj = req.body;
   const img = []
 
-  const itemRefPar = firebase.ref(`user/${obj.user_id}/event/${obj.event_id}/participant`)
-  //console.log(itemRefPar)
-  itemRefPar.on("value", (snapshot) => {
-    snapshot.forEach(par => {
-      //const par_id = par.key
-      //console.log(faceapi.nets)
-      //const img = faceapi.fetchImage(`./trainfacemodel/bright@gmail.com/1.jpg`) //ไฟล์ที่เอาไป Process 
-      //console.log(img)
-      //console.log(image)
-      //const itemRefTest = firebase.ref(`user/${obj.user_id}/event/${obj.event_id}/participant/${par_id}`)
-      
-      //itemRefTest.push(item)
+  const itemRefImg = firebase.ref(`user/${obj.user_id}/event/${obj.event_id}/images`)
+  itemRefImg.on("value", (snapshot) => {
+    const num = snapshot.numChildren()
 
-      //const parimage = par.val() //รอดึงรูป
-      //console.log(parimage)
-      //itemRefPar.child(this.state.event_id).update()
-      //console.log(images2);
-      // let test = {
-      //   email :'teafsgregdsvdsvdv'
-      // }
-      //itemRefPar.child(images2.email).update(test);
+    const itemRefPar = firebase.ref(`user/${obj.user_id}/event/${obj.event_id}/participant`)
+    //console.log(itemRefPar)
+    itemRefPar.on("value", (snapshot) => {
+      snapshot.forEach(par => {
+
+        const labeledFaceDescriptors = loadLabeledImages()
+
+        function loadLabeledImages() {
+          const labels = par.val().email
+          console.log(labels)
+          return Promise.all(
+            labels.map(async label => {
+              const descriptions = []
+              // for (let i = 1; i <= 3; i++) {
+              //   const img = await faceapi.fetchImage(`./trainfacemodel/${label}/${i}.jpg`) //ไฟล์ที่เอาไป Process 
+              //   console.log(img)
+              //   const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
+              //   descriptions.push(detections.descriptor)
+              // }
+
+              return new faceapi.LabeledFaceDescriptors(label, descriptions)
+            })
+          )
+        }
+
+
+        const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.5)
+        console.log(faceMatcher)
+        let image
+        //image = await faceapi.fetchImage(`./eventpicture/test${i}.jpg`) //ไฟล์ที่เอาไปเช็ค
+        console.log(image)
+        // const displaySize = { width: image.width, height: image.height }
+        // const detections = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
+        // const resizedDetections = faceapi.resizeResults(detections, displaySize)
+        // const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
+        // results.forEach((result, i) => {
+        //     console.log(result._label)
+        //     if (result._label != "unknown") {
+        //         printname.push({ name: result._label })
+        //         console.log('work')
+        //     } else {
+        //         console.log('not do anything')
+        //     }
+        // })
+        // console.log(printname)
+
+
+
+      })
+    })
+
+
+
+    snapshot.forEach((doc) => {
+
+      const labeledFaceDescriptors = loadLabeledImages()
+
+      function loadLabeledImages() {
+
+        // const labels = ['bright@gmail.com', 'earn@gmail.com', 'earth@gmail.com']
+
+      }
+
+      //const images = doc.val().metadataFile.downloadURLs
+      //console.log(processimg)
+      //console.log(images)
+      //img.push(images)
     });
+
+
+
   });
 
 
-  // const itemRefImg = firebase.ref(`user/${obj.user_id}/event/${obj.event_id}/images`)
-  // itemRefImg.on("value", (snapshot) => {
-  //   snapshot.forEach(doc => {
-  //     const images = doc.val().metadataFile.downloadURLs
-  //     const processimg = {
-  //       id: doc.key,
-  //       is_allow: true,
-  //       orginal_image_url: images,
-  //       processed_image_url: ''
+  // const itemRefPar = firebase.ref(`user/${obj.user_id}/event/${obj.event_id}/participant`)
+  // //console.log(itemRefPar)
+  // itemRefPar.on("value", (snapshot) => {
+  //   snapshot.forEach(par => {
+  //     const par_id = par.key
+  //     console.log(par_id)
+  //     //const img = faceapi.fetchImage(`./trainfacemodel/bright@gmail.com/1.jpg`) //ไฟล์ที่เอาไป Process 
+  //     //console.log(img)
+  //     //console.log(image)
+  //     //const itemRefTest = firebase.ref(`user/${obj.user_id}/event/${obj.event_id}/participant/${par_id}`)
+
+  //     //itemRefTest.push(item)
+  //     const parimage = par.val().headshot_url //รอดึงรูป
+  //     console.log(parimage)
+
+  //     //itemRefPar.child(this.state.event_id).update()
+  //     //console.log(images2);
+  //     let test = {
+  //       email :'teafsgregdsvdsvdv'
   //     }
-  //     console.log(processimg)
-
-  //     //console.log(images)
-  //     //img.push(images)
-
+  //     //itemRefPar.child(images2.email).update(test);
   //   });
   // });
+
+
+
 
   // console.log(img)
 
@@ -163,43 +222,44 @@ app.listen(port, () => console.log(`Listening on port ${port}!`))
 
 
 app.post('/test_api2', (req, res) => {
-    const printname = []
-    for (let i = 1; i <= 4; i++) {
-        const labeledFaceDescriptors = loadLabeledImages()
-        function loadLabeledImages() {
-            const labels = ['bright@gmail.com', 'earn@gmail.com', 'earth@gmail.com']
-            return Promise.all(
-                labels.map( label => {
-                    const descriptions = []
-                    for (let i = 1; i <= 3; i++) {
-                        const img = faceapi.fetchImage(`./trainfacemodel/${label}/${i}.jpg`) //ไฟล์ที่เอาไป Process 
-                        console.log(img)
-                        const detections = faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
-                        descriptions.push(detections.descriptor)
-                    }
-                    return new faceapi.LabeledFaceDescriptors(label, descriptions)
-                })
-            )
-        }
-        const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.5)
-        let image, canvas
-        image = faceapi.fetchImage(`./eventpicture/test${i}.jpg`) //ไฟล์ที่เอาไปเช็ค
-        console.log(image)
-        const displaySize = { width: image.width, height: image.height }
-        const detections = faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
-        const resizedDetections = faceapi.resizeResults(detections, displaySize)
-        const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
-        results.forEach((result, i) => {
-            console.log(result._label)
-            if (result._label != "unknown") {
-                printname.push({ name: result._label })
-                console.log('work')
-            } else {
-                console.log('not do anything')
-            }
-        })
-        console.log(printname)
-        
-    }
+  const printname = []
+  console.log('tesdssfsdf')
+  // for (let i = 1; i <= 4; i++) {
+  //     const labeledFaceDescriptors = await loadLabeledImages()
+  //     function loadLabeledImages() {
+  //         const labels = ['bright@gmail.com', 'earn@gmail.com', 'earth@gmail.com']
+  //         return Promise.all(
+  //             labels.map(async label => {
+  //                 const descriptions = []
+  //                 for (let i = 1; i <= 3; i++) {
+  //                     const img = await faceapi.fetchImage(`./trainfacemodel/${label}/${i}.jpg`) //ไฟล์ที่เอาไป Process 
+  //                     console.log(img)
+  //                     const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
+  //                     descriptions.push(detections.descriptor)
+  //                 }
+  //                 return new faceapi.LabeledFaceDescriptors(label, descriptions)
+  //             })
+  //         )
+  //     }
+  //     const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.5)
+  //     let image, canvas
+  //     image = await faceapi.fetchImage(`./eventpicture/test${i}.jpg`) //ไฟล์ที่เอาไปเช็ค
+  //     console.log(image)
+  //     const displaySize = { width: image.width, height: image.height }
+  //     const detections = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
+  //     const resizedDetections = faceapi.resizeResults(detections, displaySize)
+  //     const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
+  //     results.forEach((result, i) => {
+  //         console.log(result._label)
+  //         if (result._label != "unknown") {
+  //             printname.push({ name: result._label })
+  //             console.log('work')
+  //         } else {
+  //             console.log('not do anything')
+  //         }
+  //     })
+  //     console.log(printname)
 
-    })
+  // }
+
+})

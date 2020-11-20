@@ -71,7 +71,8 @@ async function start() {
 
 async function begin() {
     const printname = []
-    for (let i = 1; i <= 4; i++) {
+    const cors = require('cors')
+    for (let i = 1; i <= 1; i++) {
         const labeledFaceDescriptors = await loadLabeledImages()
         function loadLabeledImages() {
             const labels = ['bright@gmail.com', 'earn@gmail.com', 'earth@gmail.com']
@@ -89,8 +90,8 @@ async function begin() {
             )
         }
         const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.5)
-        let image, canvas
-        image = await faceapi.fetchImage(`./eventpicture/test${i}.jpg`) //ไฟล์ที่เอาไปเช็ค
+        let image
+        image = await faceapi.fetchImage(`https://firebasestorage.googleapis.com/v0/b/test-file-store-d0505.appspot.com/o/images%2FIMG_25630328_171911.jpg?alt=media&token=61c73e10-013a-44c3-a06e-51ab98182a90`) //ไฟล์ที่เอาไปเช็ค
         console.log(image)
         const displaySize = { width: image.width, height: image.height }
         const detections = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
